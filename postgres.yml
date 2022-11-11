@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+    #################################a###########
+    ### POSTGRES 14.2 ##########################
+    ############################################
+    postgres:
+        container_name: ${APP_NAME}_postgres
+        image: postgres:latest
+        # ports:
+        # - "5432:5432"
+        environment:
+            - POSTGRES_USER=${POSTGRES_USER:-postgres} # The PostgreSQL user (useful to connect to the database)
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password} # The PostgreSQL password (useful to connect to the database)
+            - POSTGRES_DB=${POSTGRES_DATABASE:-coder} # The PostgreSQL default database (automatically created at first launch)
+        volumes:
+            - ${MOUNT_BASE_PATH}/postgres/data:/var/lib/postgresql/data # Use "docker volume rm coder_coder_data" to reset Coder
