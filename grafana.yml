@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Grafana ###########################################
+    ######################################################
+    grafana:
+        container_name: grafana
+        image: grafana/grafana-oss
+        restart: unless-stopped
+        user: root
+        # ports:
+        #   - 3000:3000
+        volumes:
+            - ${MOUNT_BASE_PATH}/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+            - ${MOUNT_BASE_PATH}/grafana/lib:/var/lib/grafana

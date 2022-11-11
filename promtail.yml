@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Promtail ##########################################
+    ######################################################
+    promtail:
+        container_name: promtail
+        image: grafana/promtail:2.6.1
+        volumes:
+            - ${DOCKER_LIB_PATH}/containers:/var/lib/docker/containers
+            - ${MOUNT_BASE_PATH}/promtail/config:/mnt/config
+            - ${MOUNT_BASE_PATH}/log:/var/log
+        command: 
+            - -config.file=/mnt/config/config.yaml

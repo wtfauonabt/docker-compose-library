@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Code Server #######################################
+    ######################################################
+    codeserver:
+        container_name: codeserver
+        build: ${BUILD_BASE_PATH}/codeserver/.
+        image: liferay/codeserver:1.0.0
+        # user: root
+        # ports:
+        #   - 3003:3000
+        restart: unless-stopped
+        # env_file: ${ENV_FILE_PATH}
+        environment:
+            - PUID=${CODESERVER_PUID}
+            - PGID=${CODESERVER_PGID}
+            - TZ=${CODESERVER_TZ}
+            - PASSWORD=${CODESERVER_PASSWORD} #optional
+            # - HASHED_PASSWORD= #optional
+            - SUDO_PASSWORD=${CODESERVER_SUDO_PASSWORD} #optional
+            # - SUDO_PASSWORD_HASH= #optional
+            # - PROXY_DOMAIN=do.plat-it.com #optional
+            - DEFAULT_WORKSPACE=${BASE_PATH} #optional
+
+        volumes:
+            - ${BASE_PATH}:${BASE_PATH}
+            - ${MOUNT_BASE_PATH}/codeserver/.config:/config
+            - ${DOCKER_SOCK_PATH}:/var/run/docker.sock

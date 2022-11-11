@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+    ############################################
+    ### NGINX PROXY SERVICE ####################
+    ############################################
+    nginx:
+        container_name: ${APP_NAME}_nginx
+        image: jc21/nginx-proxy-manager:latest
+        restart: unless-stopped
+        ports:
+            - '80:80'
+            - '81:81'
+            - '443:443'
+        volumes:
+            - ${NGINX_PROXY_MANAGER_DATA}:/data
+            - ${NGINX_PROXY_MANAGER_LETSENCRYPT}:/etc/letsencrypt

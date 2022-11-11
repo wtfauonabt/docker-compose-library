@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Adminer ###########################################
+    ######################################################
+    adminer:
+        container_name: adminer
+        image: adminer
+        restart: always
+        # ports:
+        #   - 3002:8080
+        volumes:
+            - ${MOUNT_BASE_PATH}/adminer/adminer.css:/var/www/html/adminer.css

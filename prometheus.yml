@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+    ############################################
+    ### PROMETHEUS #############################
+    ############################################  
+    prometheus:
+        container_name: prometheus
+        image: prom/prometheus:latest
+        # ports:
+        #     - 9090:9090
+        volumes:
+            - ${MOUNT_BASE_PATH}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+        command:
+            - --config.file=/etc/prometheus/prometheus.yml

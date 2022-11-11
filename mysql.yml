@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+    ############################################
+    ### MYSQL 5.1.73 ###########################
+    ############################################  
+    mysql:
+        container_name: ${APP_NAME}_mysql
+        image: vsamov/mysql-5.1.73
+        restart: always
+        env_file:
+            - ".env"
+        environment:
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_ROOT_USER=${MYSQL_ROOT_USER}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        ports:
+            - "3306:3306"
+        volumes:
+            - "${MOUNT_BASE_PATH}/mysql/data/db/mysql:/var/lib/mysql"
+            - "${MOUNT_BASE_PATH}/mysql/config:/etc/mysql"

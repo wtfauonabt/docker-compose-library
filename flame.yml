@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Flame #############################################
+    ######################################################
+    flame:
+        container_name: flame
+        image: pawelmalak/flame
+        restart: unless-stopped
+        # ports:
+        #   - 5005:5005
+        environment:
+            - PASSWORD=${FLAME_PASSWORD}
+        volumes:
+            - ${MOUNT_BASE_PATH}/flame:/app/data
+            - ${DOCKER_SOCK_PATH}:/var/run/docker.sock
+        networks:
+            - env-network
+
+networks:
+    env-network:
+        name: ${NETWORK_NAME}
+        external: true
