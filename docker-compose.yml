@@ -6,17 +6,6 @@ services:
             service: nginx-proxy-manager
         container_name: nginx
 
-    adminer:
-        extends:
-            file: ${COMPOSE_BASE_PATH}/adminer.yml
-            service: adminer
-
-    kong:
-        extends:
-            file: ${COMPOSE_BASE_PATH}/kong.yml
-            service: kong
-
-    
 networks:
     env-network:
         name: ${NETWORK_NAME}

@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Rancher ###########################################
+    ## PORT: 80 / 443 ####################################
+    ######################################################
+    rancher:
+        container_name: rancher
+        image: rancher/rancher
+        privileged: true
+        restart: unless-stopped
