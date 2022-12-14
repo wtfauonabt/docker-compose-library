@@ -3,7 +3,7 @@ services:
     ######################################################
     ## Kong ##############################################
     ######################################################
-    codeserver:
+    kong:
         container_name: kong
         image: kong
         # ports:
@@ -14,8 +14,8 @@ services:
         restart: unless-stopped
         # env_file: ${ENV_FILE_PATH}
         environment:
-            - KONG_DATABASE=cassandra
-            - KONG_CASSANDRA_CONTACT_POINTS=cassandra
+            - KONG_DATABASE=postgres
+            - KONG_=cassandra
             - KONG_PROXY_ACCESS_LOG=/dev/stdout
             - KONG_ADMIN_ACCESS_LOG=/dev/stdout
             - KONG_PROXY_ERROR_LOG=/dev/stderr

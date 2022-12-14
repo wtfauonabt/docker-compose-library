@@ -10,6 +10,5 @@ services:
         #   - "3100:3100"
         volumes:
             - ${MOUNT_BASE_PATH}/loki/config:/mnt/config
-        command: 
         command:
             - -config.file=/mnt/config/config.yaml

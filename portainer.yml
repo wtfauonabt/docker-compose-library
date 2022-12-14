@@ -27,3 +27,14 @@ networks:
     env-network:
         name: ${NETWORK_NAME}
         external: true
+
+volumes:
+    portainer_data:
+        driver: local
+    mount:
+        driver: local
+        # driver_opts:
+    compose:
+        driver: local
+    build:
+        driver: local
