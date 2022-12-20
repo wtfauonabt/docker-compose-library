@@ -9,3 +9,10 @@ services:
         image: rancher/rancher
         privileged: true
         restart: unless-stopped
+        networks:
+            - env-network
+
+networks:
+    env-network:
+        name: ${NETWORK_NAME}
+        external: true
