@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+    ######################################################
+    ## RunDeck ###########################################
+    ## PORT: 4440 ########################################
+    ######################################################
+    rundeck:
+        container_name: ${APP_PREFIX}rundeck
+        image: ${RUNDECK_IMAGE:-rundeck/rundeck:SNAPSHOT}
+        tty: true
+        environment:
+          - RUNDECK_GRAILS_URL=${RUNDECK_URL:-127.0.0.1:4440}
+        volumes:
+          - rundeck_data:/home/rundeck/server/data
+          - ${RUNDECK_LICENSE_FILE:-/dev/null}:/home/rundeck/etc/rundeckpro-license.key
+        ports:
+          - 4440:4440
+
+volumes:
+    rundeck_data: 
+        driver: local
