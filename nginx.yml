@@ -4,7 +4,7 @@ services:
     ### NGINX PROXY SERVICE ####################
     ############################################
     nginx:
-        container_name: ${APP_NAME}_nginx
+        container_name: ${APP_PREFIX}nginx
         image: jc21/nginx-proxy-manager:latest
         restart: unless-stopped
         ports:
@@ -12,5 +12,11 @@ services:
             - '81:81'
             - '443:443'
         volumes:
-            - ${NGINX_PROXY_MANAGER_DATA}:/data
-            - ${NGINX_PROXY_MANAGER_LETSENCRYPT}:/etc/letsencrypt
+            - nginx_data:/data
+            - letsencrypt:/etc/letsencrypt
+
+volumes:
+    nginx_data:
+        driver: local
+    letsencrypt:
+        driver: local

@@ -2,39 +2,22 @@ version: "3.9"
 services:
     ######################################################
     ## Portainer #########################################
+    ## PORT: 9000 ########################################
     ######################################################
     portainer-ce:
-        container_name: portainer-ce
+        container_name: ${APP_PREFIX}portainer
         image: portainer/portainer-ce:latest
         restart: unless-stopped
         security_opt:
             - no-new-privileges:true
-        # ports:
-        #     - 9000:9000
         volumes:
             - ${LOCAL_TIME_PATH}:/etc/localtime:ro
             - ${DOCKER_SOCK_PATH}:/var/run/docker.sock:ro
-            - ${MOUNT_BASE_PATH}/portainer/data:/data
-        networks:
-            - env-network
-        labels:
-            - traefik.enable=true
-            - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN_HOST_NAME}`)
-            - traefik.http.routers.portainer.entrypoints=${TRAEFIK_SECURE_ENTRYPOINT}
-            - traefik.http.routers.portainer.tls.certresolver=${TRAEFIK_CERT_RESOLVER}
-
-networks:
-    env-network:
-        name: ${NETWORK_NAME}
-        external: true
+            - portainer_data:/data
+            - ${MOUNT_BASE_PATH}:/mount
+            - ${COMPOSE_BASE_PATH}:/compose
+            - ${BUILD_BASE_PATH}:/build
 
 volumes:
     portainer_data:
-        driver: local
-    mount:
-        driver: local
-        # driver_opts:
-    compose:
-        driver: local
-    build:
         driver: local

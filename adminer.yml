@@ -2,12 +2,11 @@ version: "3.9"
 services:
     ######################################################
     ## Adminer ###########################################
+    ## PORT: 8080 ########################################
     ######################################################
     adminer:
-        container_name: adminer
+        container_name: ${APP_PREFIX}adminer
         image: adminer
         restart: always
-        # ports:
-        #   - 3002:8080
         volumes:
-            - ${MOUNT_BASE_PATH}/adminer/adminer.css:/var/www/html/adminer.css
+            - ${ADMINER_CSS_PATH}:/var/www/html/adminer.css
