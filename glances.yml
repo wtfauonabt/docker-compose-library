@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Glances ###########################################
+    ## PORT:  ###########################################
+    ######################################################
+    glances:
+        image: nicolargo/glances:latest-alpine
+        restart: always
+        pid: host
+        volumes:
+            - $DOCKER_SOCK_PATH:/var/run/docker.sock
+        environment:
+            - "GLANCES_OPT=-w"
+#         secrets:
+#             - source: glances_password
+#                 target: /root/.config/glances/glances.pwd
+
+# secrets:
+#     glances_password:
+#         file: $GLANCES_PWD_PATH
