@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+    ######################################################
+    ## bind9 #############################################
+    ## PORT: 53/udp, 53/tcp, 953 #########################
+    ######################################################
+    bind9:
+        container_name: bind9
+        image: internetsystemsconsortium/bind9
+        restart: unless-stopped
+        volumes:
+            - ${MOUNT_BASE_PATH}/bind9/etc:/etc/bind
+            - ${MOUNT_BASE_PATH}/bind9/cache:/var/cache/bind
+            - ${MOUNT_BASE_PATH}/bind9/lib:/var/lib/bind
+            - ${MOUNT_BASE_PATH}/bind9/log:/var/log
+        networks:
+            - env-network
+
+networks:
+    env-network:
+        name: ${NETWORK_NAME}
+        external: true
