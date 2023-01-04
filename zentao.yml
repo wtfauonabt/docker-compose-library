@@ -7,14 +7,11 @@ services:
     zentao:
         container_name: zentao
         image: idoop/zentao
-        ports:
-            - 80:80
-            - 3306:3306
         environment:
             - ADMINER_USER="root"
             - ADMINER_PASSWD="password"
             - BIND_ADDRESS="false"
         volumes:
-            - zentao_data:/opt/zbox/
+            - ${MOUNT_BASE_PATH}/zentao:/opt/zbox/
         # extra_hosts:
         #     - smtp.email.qq.com:163.177.90.125
