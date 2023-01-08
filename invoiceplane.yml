@@ -7,7 +7,7 @@ services:
         container_name: ${APP_PREFIX}invoiceplane
         image: mhzawadi/invoiceplane:dev
         volumes:
-            - invoice_plane_data:/var/www/html/uploads
+            - invoiceplane_data:/var/www/html/uploads
         environment:
             - TZ=utc
             - MYSQL_HOST=mariadb_10_4
@@ -17,5 +17,5 @@ services:
             - IP_URL=${INVOICEPLANE_URL} ##http://invoiceplane.docker.local
             - DISABLE_SETUP=false
 volumes:
-    invoice_plane_data:
+    invoiceplane_data:
         driver: local
