@@ -4,17 +4,18 @@ services:
     ## Invoice Plane #####################################
     ######################################################
     invoiceplane:
+        container_name: ${APP_PREFIX}invoiceplane
         image: mhzawadi/invoiceplane:dev
         volumes:
-            - invoiceplane_data:/var/www/html/uploads
+            - invoice_plane_data:/var/www/html/uploads
         environment:
             - TZ=utc
             - MYSQL_HOST=mariadb_10_4
             - MYSQL_USER=InvoicePlane
             - MYSQL_PASSWORD=invoiceplane
             - MYSQL_DB=InvoicePlane
-            - IP_URL=${INVOICE_PLANE_URL} ##http://invoiceplane.docker.local
+            - IP_URL=${INVOICEPLANE_URL} ##http://invoiceplane.docker.local
             - DISABLE_SETUP=false
 volumes:
-    invoiceplane_data:
+    invoice_plane_data:
         driver: local
