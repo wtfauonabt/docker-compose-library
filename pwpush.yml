@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Password Push #####################################
+    ## PORT: 5100 ########################################
+    ######################################################
+    pwpush:
+        container_name: ${APP_PREFIX}pwpush
+        image: pglombardo/pwpush-ephemeral:release
