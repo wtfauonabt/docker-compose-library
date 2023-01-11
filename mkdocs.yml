@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+    ######################################################
+    ## MkDocs ############################################
+    ## PORT: 8000 ########################################
+    ######################################################
+    mkdocs:
+        container_name: mkdocs
+        image: grafana/grafana-oss
+        restart: unless-stopped
+        user: root
+        volumes:
+            - ${MOUNT_BASE_PATH}/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+            - ${MOUNT_BASE_PATH}/grafana/lib:/var/lib/grafana
