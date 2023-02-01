@@ -16,12 +16,3 @@ services:
             - host.docker.internal:host-gateway
         volumes:
             - ${DOCKER_SOCK_PATH}:/var/run/docker.sock:ro
-
-volumes:
-    portainer_data:
-        driver: local
-
-
-
-
-
