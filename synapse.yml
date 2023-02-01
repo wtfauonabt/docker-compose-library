@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Synapse ###########################################
+    ## PORT: 42286, 41387 ################################
+    ######################################################
+    synapse:
+        container_name: ${APP_PREFIX}synapse
+        image: ghcr.io/serverlessworkflow/synapse:latest
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - SYNAPSE_API_HOSTNAME=synapse
+            - SYNAPSE_PERSISTENCE_WRITEMODEL_DEFAULT_REPOSITORY=EventStore
+            - SYNAPSE_PERSISTENCE_READMODEL_DEFAULT_REPOSITORY=MongoDB
+        extra_hosts:
+            - host.docker.internal:host-gateway
+        volumes:
+            - ${DOCKER_SOCK_PATH}:/var/run/docker.sock:ro
+
+volumes:
+    portainer_data:
+        driver: local
+
+
+
+
+

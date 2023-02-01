@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Mongo #############################################
+    ## PORT: 27017 #######################################
+    ######################################################
+    mongo:
+        container_name: ${APP_PREFIX}mongo
+        image: ${MONGO_IMAGE:-mongo}
+        volumes:
+            - mongo_data:/data/db
+
+volumes:
+    mongo_data:
+        driver: local

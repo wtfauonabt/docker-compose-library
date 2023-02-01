@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Eventstore #############################################
+    ## PORT: 1113, 2113 ##################################
+    ######################################################
+    eventstore:
+        container_name: ${APP_PREFIX}eventstore
+        image: ${EVENTSTORE_IMAGE:-eventstore/eventstore}
+        environment:
+            - EVENTSTORE_CLUSTER_SIZE=${EVENTSTORE_CLUSTER_SIZE:-1}
+            - EVENTSTORE_RUN_PROJECTIONS=${EVENTSTORE_RUN_PROJECTIONS:-All}
+            - EVENTSTORE_START_STANDARD_PROJECTIONS=${EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP:-true}
+            - EVENTSTORE_EXT_TCP_PORT=${EVENTSTORE_EXT_TCP_PORT:-1113}
+            - EVENTSTORE_HTTP_PORT=${EVENTSTORE_HTTP_PORT:-2113}
+            - EVENTSTORE_INSECURE=${EVENTSTORE_INSECURE:-true}
+            - EVENTSTORE_ENABLE_EXTERNAL_TCP=${EVENTSTORE_ENABLE_EXTERNAL_TCP:-true}
+            - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=${EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP:-true}
+        volumes:
+            - eventstore_data:/var/lib/eventstore
+
+volumes:
+    eventstore_data:
+        driver: local
