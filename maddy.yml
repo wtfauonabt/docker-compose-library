@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Maddy #############################################
+    ## PORT: 25, 143, 587, 993 ###########################
+    ######################################################
+    maddy:
+        container_name: ${APP_PREFIX}maddy
+        image: foxcpp/maddy
+        # image: foxcpp/maddy:0.6
+        environment:
+            - MADDY_HOSTNAME=${MADDY_HOSTNAME:-mx.maddy.test}
+            - MADDY_DOMAIN=${MADDY_DOMAIN:-maddy.test}
+        volumes:
+            - maddy_data:/data
+
+volumes:
+    maddy_data:
+        driver: local
