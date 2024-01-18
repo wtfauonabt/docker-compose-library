@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Dockge ############################################
+    ## Port: 5001 ########################################
+    ######################################################
+    dockge:
+      container_name: ${APP_PREFIX:-default-}dockge
+      image: louislam/dockge:1
+      restart: unless-stopped
+      ports:
+        # Host Port : Container Port
+        - 5001:5001
+      volumes:
+        - ${DOCKER_SOCK_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+        - dockge_data:/app/data
+          
+        # If you want to use private registries, you need to share the auth file with Dockge:
+        # - /root/.docker/:/root/.docker
+  
+        # Stacks Directory
+        # ⚠️ READ IT CAREFULLY. If you did it wrong, your data could end up writing into a WRONG PATH.
+        # ⚠️ 1. FULL path only. No relative path (MUST)
+        # ⚠️ 2. Left Stacks Path === Right Stacks Path (MUST)
+        - dockge_compose:/opt/stack
+      environment:
+        # Tell Dockge where is your stacks directory
+        - DOCKGE_STACKS_DIR=/opt/stack
+      networks:
+          - env-network
+
+volumes:
+    dockge_compose:
+        driver: local
+    dockge_data:
+        driver: local
+
+networks:
+    env-network:
+        name: ${NETWORK_NAME:-default_network}
+        external: true
