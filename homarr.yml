@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+    ######################################################
+    ## HOMARR ############################################
+    ## PORT: 7575 ########################################
+    ######################################################
+    homarr:
+        container_name: homarr
+        image: ghcr.io/ajnart/homarr:0.14.3
+        volumes:
+            - ${DOCKER_SOCK_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+            - ${MOUNT_PATH:-./mnt}/homarr/config:/app/data/config
+            - ${MOUNT_PATH:-./mnt}/homarr/data:/data
+            - ${MOUNT_PATH:-./mnt}/homarr/icons:/app/public/icons
+        ports:
+            - 7575:7575
