@@ -4,7 +4,11 @@ services:
     ## Invoice Plane #####################################
     ######################################################
     invoiceplane:
+<<<<<<< Updated upstream
         container_name: ${APP_PREFIX}invoiceplane
+=======
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}invoiceplane
+>>>>>>> Stashed changes
         image: mhzawadi/invoiceplane:dev
         volumes:
             - invoiceplane_data:/var/www/html/uploads

@@ -1,0 +1,41 @@
+## NOT WORKING
+version: "3.9"
+services:
+    pms-docker:
+      container_name: ${APP_PREFIX:-default-}plex
+      image: plexinc/pms-docker:latest
+      environment:
+        - TZ=${TZ:-Asia/Hong_Kong}
+        - PLEX_CLAIM=claim-Bg2fomq4q8hQkNvryiQ_
+      volumes:
+        - plex_config:/config
+        - plex_transcode:/transcode
+        - plex_data:/data
+      networks:
+          - env-network
+
+volumes:
+    plex_config:
+        driver: local
+    plex_transcode:
+        driver: local
+    plex_data:
+        driver: local
+
+networks:
+    env-network:
+        name: ${NETWORK_NAME:-default_network}
+        external: true
+
+
+# APP_NAME=home
+# APP_PREFIX=${APP_NAME}-
+# NETWORK_NAME=home
+# BASE_PATH=./
+# MOUNT_BASE_PATH=${BASE_PATH}/docker/mnt
+# BUILD_BASE_PATH=${BASE_PATH}/docker/docker-build-library
+# COMPOSE_BASE_PATH=/compose
+# NETWORK_BASE_FILE=${COMPOSE_BASE_PATH}/network.yml
+# DOCKER_SOCK_PATH=/var/run/docker.sock
+# DOCKER_LIB_PATH=/var/lib/docker
+# TZ=Asia/Hong_Kong

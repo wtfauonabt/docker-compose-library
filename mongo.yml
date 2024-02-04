@@ -5,7 +5,11 @@ services:
     ## PORT: 27017 #######################################
     ######################################################
     mongo:
+<<<<<<< Updated upstream
         container_name: ${APP_PREFIX}mongo
+=======
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}mongo
+>>>>>>> Stashed changes
         image: ${MONGO_IMAGE:-mongo}
         volumes:
             - mongo_data:/data/db

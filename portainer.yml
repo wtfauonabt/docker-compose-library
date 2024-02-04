@@ -5,18 +5,31 @@ services:
     ## PORT: 9000 ########################################
     ######################################################
     portainer-ce:
+<<<<<<< Updated upstream
         container_name: ${APP_PREFIX}portainer
+=======
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}portainer
+>>>>>>> Stashed changes
         image: portainer/portainer-ce:latest
         restart: unless-stopped
         security_opt:
             - no-new-privileges:true
         volumes:
+<<<<<<< Updated upstream
             - ${LOCAL_TIME_PATH}:/etc/localtime:ro
             - ${DOCKER_SOCK_PATH}:/var/run/docker.sock:ro
             - portainer_data:/data
             - ${MOUNT_BASE_PATH}:/mount
             - ${COMPOSE_BASE_PATH}:/compose
             - ${BUILD_BASE_PATH}:/build
+=======
+            - ${LOCAL_TIME_PATH:-/usr/bin/localtime}:/etc/localtime:ro
+            - ${DOCKER_SOCK_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro
+            - portainer_data:/data
+            - ${MOUNT_BASE_PATH:-./mount}/portainer:/mount
+            - ${COMPOSE_BASE_PATH:-./compose}:/compose
+            - ${BUILD_BASE_PATH:-./build}:/build
+>>>>>>> Stashed changes
 
 volumes:
     portainer_data:

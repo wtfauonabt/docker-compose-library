@@ -5,7 +5,11 @@ services:
     ## PORT: 42286, 41387 ################################
     ######################################################
     synapse:
+<<<<<<< Updated upstream
         container_name: ${APP_PREFIX}synapse
+=======
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}synapse
+>>>>>>> Stashed changes
         image: ghcr.io/serverlessworkflow/synapse:latest
         environment:
             - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}

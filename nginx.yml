@@ -1,10 +1,18 @@
 version: "3.9"
 services:
     ############################################
+<<<<<<< Updated upstream
     ### NGINX PROXY SERVICE ####################
     ############################################
     nginx:
         container_name: ${APP_PREFIX}nginx
+=======
+    ### NGINX PROXY MANAGER ####################
+    ### PORT: 80, 81, 443 ###################### 
+    ############################################
+    nginx-proxy-manager:
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}nginx
+>>>>>>> Stashed changes
         image: jc21/nginx-proxy-manager:latest
         restart: unless-stopped
         ports:

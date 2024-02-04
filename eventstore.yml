@@ -5,7 +5,11 @@ services:
     ## PORT: 1113, 2113 ##################################
     ######################################################
     eventstore:
+<<<<<<< Updated upstream
         container_name: ${APP_PREFIX}eventstore
+=======
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}eventstore
+>>>>>>> Stashed changes
         image: ${EVENTSTORE_IMAGE:-eventstore/eventstore}
         environment:
             - EVENTSTORE_CLUSTER_SIZE=${EVENTSTORE_CLUSTER_SIZE:-1}

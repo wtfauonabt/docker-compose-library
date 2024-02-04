@@ -5,6 +5,7 @@ services:
     ## PORT: 7575 ########################################
     ######################################################
     homarr:
+<<<<<<< Updated upstream
         container_name: homarr
         image: ghcr.io/ajnart/homarr:0.14.3
         volumes:
@@ -14,3 +15,36 @@ services:
             - ${MOUNT_PATH:-./mnt}/homarr/icons:/app/public/icons
         ports:
             - 7575:7575
+=======
+        container_name: ${APP_PREFIX:-default-}homarr
+        image: ghcr.io/ajnart/homarr:0.14.3
+        volumes:
+            - ${DOCKER_SOCK_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+            - homarr_config:/app/data/config
+            - homarr_data:/data
+            - homarr_icons:/app/public/icons
+        ports:
+            - 7575:7575
+        networks:
+            - env-network
+
+volumes:
+    homarr_config:
+        driver: local
+    homarr_data:
+        driver: local
+    homarr_icons:
+        driver: local
+
+networks:
+    env-network:
+        name: ${NETWORK_NAME:-default_network}
+        external: true
+
+
+
+# APP_NAME=home
+# APP_PREFIX=${APP_NAME}-
+# NETWORK_NAME=home
+# DOCKER_SOCK_PATH=/var/run/docker.sock
+>>>>>>> Stashed changes

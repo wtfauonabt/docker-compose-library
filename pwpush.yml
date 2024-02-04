@@ -5,5 +5,9 @@ services:
     ## PORT: 5100 ########################################
     ######################################################
     pwpush:
+<<<<<<< Updated upstream
         container_name: ${APP_PREFIX}pwpush
+=======
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}pwpush
+>>>>>>> Stashed changes
         image: pglombardo/pwpush-ephemeral:release

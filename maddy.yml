@@ -5,7 +5,11 @@ services:
     ## PORT: 25, 143, 587, 993 ###########################
     ######################################################
     maddy:
+<<<<<<< Updated upstream
         container_name: ${APP_PREFIX}maddy
+=======
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}maddy
+>>>>>>> Stashed changes
         image: foxcpp/maddy
         # image: foxcpp/maddy:0.6
         environment:

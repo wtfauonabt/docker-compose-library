@@ -1,0 +1,39 @@
+version: "3.3"
+services:
+  octobot:
+    stdin_open: true
+    tty: true
+    container_name: ${APP_PREFIX:-default-}octobot
+    volumes:
+      - octobot-user:/octobot/user
+      - octobot-tentacles:/octobot/tentacles
+      - octobot-logs:/octobot/logs
+    image: drakkarsoftware/octobot:stable
+    networks:
+      - env-network
+
+volumes:
+    octobot-user:
+        driver: local
+    octobot-tentacles:
+        driver: local
+    octobot-logs:
+        driver: local
+
+networks:
+    env-network:
+        name: ${NETWORK_NAME:-default_network}
+        external: true
+
+
+# APP_NAME=home
+# APP_PREFIX=${APP_NAME}-
+# NETWORK_NAME=home
+# BASE_PATH=./
+# MOUNT_BASE_PATH=${BASE_PATH}/docker/mnt
+# BUILD_BASE_PATH=${BASE_PATH}/docker/docker-build-library
+# COMPOSE_BASE_PATH=/compose
+# NETWORK_BASE_FILE=${COMPOSE_BASE_PATH}/network.yml
+# DOCKER_SOCK_PATH=/var/run/docker.sock
+# DOCKER_LIB_PATH=/var/lib/docker
+# TZ=Asia/Hong_Kong

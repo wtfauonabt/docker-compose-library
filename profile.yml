@@ -1,0 +1,97 @@
+version: "3.9"
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:latest
+    pull_policy: always
+    ports:
+      - 80:80
+      - 443:443
+    command:
+      # - --log.level=DEBUG
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.web.http.redirections.entrypoint.permanent=true
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls=true
+      - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.tlschallenge=true
+      # - "--certificatesresolvers.syeung527resolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.email=${LETSENCRYPT_EMAIL:-test@example.com}
+      - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.storage=/letsencrypt/acme.json
+      # Enable Hub communication (open the port 9900 and 9901 by default)
+      # - --experimental.hub=true
+      # - --hub.tls.insecure=true
+      # - --metrics.prometheus.addrouterslabels=true
+    volumes:
+      - ./letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      traefik.enable: true 
+
+      # Dashboard
+      traefik.http.routers.dashboard.rule: Host(`traefik.${BASE_DOMAIN:-localhost}`)
+      traefik.http.routers.dashboard.entrypoints: websecure
+      traefik.http.routers.dashboard.tls.certresolver: ${DEFAULT_RESOLVER:-myresolver}
+      traefik.http.routers.dashboard.service: api@internal
+      traefik.http.routers.dashboard.middlewares: auth
+
+      # Default test/test
+      traefik.http.middlewares.auth.basicauth.users: ${DASHBOARD_USER:-test}:${DASHBOARD_PASS:-$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/}
+      # traefik.http.middlewares.auth.basicauth.usersfile: /path/to/my/usersfile
+    
+      # low priority rule for otherwise unmatched www. host prefixes
+      # without this it is constant redirect
+      traefik.http.routers.unmatchedwww.rule: HostRegexp(`{name:^www\..*}`) 
+      traefik.http.routers.unmatchedwww.service: noop@internal
+      traefik.http.routers.unmatchedwww.priority: 2
+
+      # lowest priority catchall rule, will add/replace www. host portion
+      traefik.http.routers.matchlast.rule: PathPrefix(`/`)
+      traefik.http.routers.matchlast.priority: 1
+      traefik.http.routers.matchlast.middlewares: addwww
+      traefik.http.middlewares.addwww.redirectregex.regex: ^https://(?:www\.)?(.*)
+      traefik.http.middlewares.addwww.redirectregex.replacement: https://www.${BASE_DOMAIN:-localhost}
+
+  # hub-agent:
+  #   container_name: hub-agent
+  #   image: ghcr.io/traefik/hub-agent-traefik:v1.0.0
+  #   pull_policy: always
+  #   restart: "on-failure"
+  #   command:
+  #     - run
+  #     - --hub.token=${TRAEFIK_HUB_TOKEN}
+  #     - --auth-server.advertise-url=http://hub-agent
+  #     - --traefik.host=traefik
+  #     - --traefik.tls.insecure=true
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   depends_on:
+  #     - traefik
+
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    labels:
+      traefik.enable: true
+      traefik.http.routers.whoami.rule: Host(`whoami.syeung527.com`)
+      traefik.http.routers.whoami.entrypoints: websecure
+      traefik.http.routers.whoami.tls.certresolver: ${DEFAULT_RESOLVER:-myresolver}
+      traefik.http.routers.whoami.middlewares: auth
+      # traefik.http.middlewares.auth.basicauth.users: ${DASHBOARD_USER:-test}:${DASHBOARD_PASS:-$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/}
+
+  profile:
+    container_name: profile
+    image: wtfauonabt/profile-frontend
+    pull_policy: always
+    labels:
+      traefik.enable: true
+      traefik.http.routers.www.rule: Host(`www.${BASE_DOMAIN:-localhost}`)
+      traefik.http.routers.www.entrypoints: websecure
+      traefik.http.routers.www.tls.certresolver: syeung527resolver
+      traefik.http.routers.profile.rule: Host(`profile.syeung527.com`)
+      traefik.http.routers.profile.entrypoints: websecure
+      traefik.http.routers.profile.tls.certresolver: ${DEFAULT_RESOLVER:-myresolver}

@@ -1,0 +1,111 @@
+# version: '3.9'
+
+# services:
+#     ######################################################
+#     ## NEXTCLOUD #########################################
+#     ######################################################
+#     db:
+#       container_name: nextcloud_postgres
+#       image: postgres
+#       restart: always
+#       volumes:
+#         - db:/var/lib/postgresql/data
+#       environment:
+#         - POSTGRES_DB_FILE=/run/secrets/postgres_db
+#         - POSTGRES_USER_FILE=/run/secrets/postgres_user
+#         - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+#       secrets:
+#         - postgres_db
+#         - postgres_password
+#         - postgres_user
+
+#     app:
+#       image: nextcloud
+#       restart: always
+#       ports:
+#         - 8080:80
+#       volumes:
+#         - nextcloud:/var/www/html
+#       environment:
+#         - POSTGRES_HOST=db
+#         - POSTGRES_DB_FILE=/run/secrets/postgres_db
+#         - POSTGRES_USER_FILE=/run/secrets/postgres_user
+#         - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+#         - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/nextcloud_admin_password
+#         - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user
+#       depends_on:
+#         - db
+#       secrets:
+#         - nextcloud_admin_password
+#         - nextcloud_admin_user
+#         - postgres_db
+#         - postgres_password
+#         - postgres_user
+
+# volumes:
+#     db:
+#     nextcloud:
+version: "3.9"
+
+services:
+  #########################################################
+  ## NextCloud ############################################
+  ## Port: 80 #############################################
+  #########################################################
+  nextcloud:
+    container_name: ${APP_PREFIX:-default-}nextcloud
+    volumes:
+      - nextcloud:/var/www/html
+      - apps:/var/www/html/custom_apps
+      - config:/var/www/html/config
+      - ${MOUNT_BASE_PATH:-/mount}/nextcloud/data:/var/www/html/data
+      - ${MOUNT_BASE_PATH:-/mount}/nextcloud/themes:/var/www/html/themes
+    image: nextcloud
+    restart: always
+    # links:
+    #   - db
+    environment:
+      - MYSQL_PASSWORD=
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-default}
+      - MYSQL_USER=${MYSQL_ROOT_USER:-root}
+      - MYSQL_HOST=db
+    networks:
+      - env-network 
+            
+  #########################################################
+  ## MariaDB ##############################################
+  ## Port: 3306 ###########################################
+  #########################################################
+  db:
+    image: mariadb:10.6
+    container_name: ${APP_PREFIX:-default-}nextcloud-mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-default}
+      - MYSQL_ROOT_USER=${MYSQL_ROOT_USER:-root}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      - MYSQL_USER=${MYSQL_USER:-user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-password}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - mysql_config:/etc/mysql
+    # networks:
+    #   - env-network    
+    
+volumes:
+  nextcloud:
+    driver: local
+  apps: 
+    driver: local
+  config:
+    driver: local
+  mariadb_data:
+    driver: local
+  mysql_config:
+    driver: local
+    
+# networks:
+#   env-network:
+#     external: true
+#     name: ${NETWORK_NAME:-default_network}

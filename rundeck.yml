@@ -5,7 +5,11 @@ services:
     ## PORT: 4440 ########################################
     ######################################################
     rundeck:
+<<<<<<< Updated upstream
         container_name: ${APP_PREFIX}rundeck
+=======
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}rundeck
+>>>>>>> Stashed changes
         image: ${RUNDECK_IMAGE:-rundeck/rundeck:SNAPSHOT}
         tty: true
         environment:

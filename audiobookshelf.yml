@@ -48,4 +48,20 @@ volumes:
 networks:
     env-network:
         name: ${NETWORK_NAME:-default_network}
+<<<<<<< Updated upstream
         external: true
+=======
+        external: true
+
+
+# APP_NAME=home
+# APP_PREFIX=${APP_NAME}-
+# NETWORK_NAME=home
+# BASE_PATH=./
+# MOUNT_BASE_PATH=${BASE_PATH}/docker/mnt
+# BUILD_BASE_PATH=${BASE_PATH}/docker/docker-build-library
+# COMPOSE_BASE_PATH=/compose
+# NETWORK_BASE_FILE=${COMPOSE_BASE_PATH}/network.yml
+# DOCKER_SOCK_PATH=/var/run/docker.sock
+# DOCKER_LIB_PATH=/var/lib/docker
+>>>>>>> Stashed changes

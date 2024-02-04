@@ -1,0 +1,83 @@
+version: '3.9'
+
+services:
+
+    ######################################################
+    ## Semaphore #########################################
+    ## Port: 3000 ########################################
+    ######################################################
+    semaphore:
+        container_name: ${APP_PREFIX:-default-}ansible-semaphore
+        image: semaphoreui/semaphore:latest
+        depends_on:
+            - mysql
+        restart: unless-stopped
+
+        environment:
+          - SEMAPHORE_DB_USER=${SEMAPHORE_MYSQL_USER:-root}
+          - SEMAPHORE_DB_PASS=${SEMAPHORE_MYSQL_PASSWORD:-ansible}
+          - SEMAPHORE_DB_HOST=mysql
+          - SEMAPHORE_DB_PORT=3306
+          - SEMAPHORE_DB_DIALECT=mysql
+          - SEMAPHORE_DB=${SEMAPHORE_MYSQL_DB:-ansible}
+          - SEMAPHORE_PLAYBOOK_PATH=/tmp/semaphore/
+          - SEMAPHORE_ADMIN_PASSWORD=${SEMAPHORE_ADMIN_PASSWORD:-password}
+          - SEMAPHORE_ADMIN_NAME=${SEMAPHORE_ADMIN_NAME:-admin}
+          - SEMAPHORE_ADMIN_EMAIL=${SEMAPHORE_ADMIN_EMAIL:-wtfauonabt@syeung527.com}
+          - SEMAPHORE_ADMIN=${SEMAPHORE_ADMIN:-admin}
+          - SEMAPHORE_ACCESS_KEY_ENCRYPTION=${SEMAPHORE_ACCESS_KEY_ENCRYPTION:-934f3df00ea0ed8f3a3f0a03f5673b0f}
+          - ANSIBLE_HOST_KEY_CHECKING=false
+        volumes:
+          - semaphore-inventory:/inventory
+          - semaphore-authorized-keys:/authorized-keys
+          - semaphore-config:/etc/semaphore
+        networks:
+            - env-network
+
+    ######################################################
+    ## MySQL #############################################
+    ## Port: 3306 ########################################
+    #######################################################
+    mysql:
+        container_name: ${APP_PREFIX:-default-}ansible-mysql
+        image: mysql:8.0
+        restart: always
+        environment:
+            - MYSQL_DATABASE=${SEMAPHORE_MYSQL_DB:-ansible}
+            - MYSQL_ROOT_PASSWORD=${SEMAPHORE_MYSQL_PASSWORD:-ansible}
+        volumes:
+            - semaphore-mysql-data:/var/lib/mysql
+            - semaphore-mysql-config:/etc/mysql
+        networks:
+            - env-network
+
+volumes:
+    semaphore-inventory:
+        driver: local
+    semaphore-authorized-keys:
+        driver: local
+    semaphore-config:
+        driver: local
+    semaphore-mysql-data:
+        driver: local
+    semaphore-mysql-config:
+        driver: local
+      
+
+networks:
+    env-network:
+        external: true
+        name: ${NETWORK_NAME:-default_network}
+
+
+# APP_NAME=home
+# APP_PREFIX=${APP_NAME}-
+# NETWORK_NAME=home
+# BASE_PATH=./
+# MOUNT_BASE_PATH=${BASE_PATH}/docker/mnt
+# BUILD_BASE_PATH=${BASE_PATH}/docker/docker-build-library
+# COMPOSE_BASE_PATH=/compose
+# NETWORK_BASE_FILE=${COMPOSE_BASE_PATH}/network.yml
+# DOCKER_SOCK_PATH=/var/run/docker.sock
+# DOCKER_LIB_PATH=/var/lib/docker
+# TZ=Asia/Hong_Kong

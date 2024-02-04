@@ -5,7 +5,11 @@ services:
     ## PORT: 3306 ########################################
     ######################################################
     mysql:
+<<<<<<< Updated upstream
         container_name: ${APP_PREFIX}mysql
+=======
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}mysql
+>>>>>>> Stashed changes
         image: ${MYSQL_IMAGE:-mysql}
         restart: always
         environment:

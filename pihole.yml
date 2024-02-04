@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+    ######################################################
+    ## PiHole ############################################
+    ## Port: 53, 80 ######################################
+    ######################################################
+    pihole:
+        container_name: ${APP_PREFIX:-default-}pihole
+        image: pihole/pihole:latest
+        ports:
+          - "53:53/tcp"
+          - "53:53/udp"
+        environment:
+          - WEBPASSWORD=${PIHOLE_PASSWORD:-password}
+          - DNSSEC=true
+          - TZ=${TZ:-Asia/Hong_Kong}
+        volumes:
+          - pihole_data:/etc/pihole
+          - pihole_dnsmasq.d:/etc/dnsmasq.d
+        restart: unless-stopped
+        networks:
+            - env-network
+    
+
+volumes:
+    pihole_data:
+        driver: local
+    pihole_dnsmasq.d:
+        driver: local
+
+networks:
+    env-network:
+        name: ${NETWORK_NAME:-default_network}
+        external: true
+
+# APP_NAME=home
+# APP_PREFIX=${APP_NAME}-
+# NETWORK_NAME=home
+# BASE_PATH=./
+# MOUNT_BASE_PATH=${BASE_PATH}/docker/mnt
+# BUILD_BASE_PATH=${BASE_PATH}/docker/docker-build-library
+# COMPOSE_BASE_PATH=/compose
+# NETWORK_BASE_FILE=${COMPOSE_BASE_PATH}/network.yml
+# DOCKER_SOCK_PATH=/var/run/docker.sock
+# DOCKER_LIB_PATH=/var/lib/docker
+# TZ=Asia/Hong_Kong
