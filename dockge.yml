@@ -38,9 +38,6 @@ volumes:
 networks:
     env-network:
         name: ${NETWORK_NAME:-default_network}
-<<<<<<< Updated upstream
-        external: true
-=======
         external: true
 
 
@@ -54,4 +51,3 @@ networks:
 # NETWORK_BASE_FILE=${COMPOSE_BASE_PATH}/network.yml
 # DOCKER_SOCK_PATH=/var/run/docker.sock
 # DOCKER_LIB_PATH=/var/lib/docker
->>>>>>> Stashed changes
