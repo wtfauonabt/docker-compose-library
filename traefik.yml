@@ -31,11 +31,7 @@ services:
             # - --metrics.prometheus.addrouterslabels=true
         volumes:
             - ./letsencrypt:/letsencrypt
-<<<<<<< Updated upstream
-            - /var/run/docker.sock:/var/run/docker.sock:ro
-=======
             - ${DOCKER_SOCK_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro
->>>>>>> Stashed changes
         labels:
             traefik.enable: true 
 
