@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+    ######################################################
+    ## Redis #############################################
+    ## Port: 6379 ########################################
+    ######################################################
+    redis:
+        image: redis
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}redis
+        environment:
+            - ALLOW_EMPTY_PASSWORD=yes
+        ports:
+            - 6379:6379
+        volumes:
+          - redis_data:/data
+
+volumes:
+    redis_data:
+        driver: local
