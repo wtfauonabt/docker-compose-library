@@ -5,15 +5,14 @@ services:
     ## PORT: 27017 #######################################
     ######################################################
     mongo:
-<<<<<<< Updated upstream
-        container_name: ${APP_PREFIX}mongo
-=======
         container_name: ${APP_PREFIX:-${APP_NAME:-default}-}mongo
->>>>>>> Stashed changes
         image: ${MONGO_IMAGE:-mongo}
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME:-mongo}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-mongo}
         volumes:
             - mongo_data:/data/db
-
+ 
 volumes:
     mongo_data:
         driver: local
