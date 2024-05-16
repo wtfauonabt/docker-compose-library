@@ -5,52 +5,52 @@ services:
     ## Infisical #########################################
     ## Port: 8080 ########################################
     ######################################################
-    backend:
-        container_name: ${APP_PREFIX:-default-}infisical-backend
+    infisical:
+        container_name: ${APP_PREFIX:-default-}infisical
         restart: unless-stopped
         depends_on:
             - mongo
         image: infisical/infisical:latest
         environment:
             - NODE_ENV=production
-            - MONGO_URL=mongodb://${MONGO_USERNAME:-mongo}:${MONGO_PASSWORD:-mongo}@${APP_PREFIX:-default-}infisical-mongo:27017/?authSource=admin
-            - REDIS_URL=redis://${APP_PREFIX:-default-}infisical-redis:6379
+            - MONGO_URL=mongodb://${MONGO_USERNAME:-mongo}:${MONGO_PASSWORD:-mongo}@${APP_PREFIX:-default-}mongo:27017/?authSource=admin
+            - REDIS_URL=redis://${APP_PREFIX:-default-}redis:6379
             - AUTH_SECRET=${AUTH_SECRET:-ea41f2b93b94e929c4686314d0ee5e493625861105f21fbe352a2b44857ffe5b}
             - ENCRYPTION_KEY=${ENCRYPTION_KEY:-NYkBpn84fRg7Pf3VFpYrVrTXFrnpBSrb}
-        networks:
-          - ext-network
+        #networks:
+          #- ext-network
           
     ######################################################
     ## Redis #############################################
     ## Port: 6379 ########################################
     ######################################################
-    redis:
-        image: redis
-        container_name: ${APP_PREFIX:-default-}infisical-redis
-        environment:
-            - ALLOW_EMPTY_PASSWORD=yes
-        ports:
-            - 6379:6379
-        volumes:
-            - infisical-redis_data:/data
-        networks:
-            - ext-network
+    #redis:
+        #image: redis
+        #container_name: ${APP_PREFIX:-default-}infisical-redis
+        #environment:
+            #- ALLOW_EMPTY_PASSWORD=yes
+        #ports:
+            #- 6379:6379
+        #volumes:
+            #- infisical-redis_data:/data
+        #networks:
+            #- ext-network
 
     ######################################################
     ## Mongo #############################################
     ## Port: 27017 #######################################
     ######################################################
-    mongo:
-        container_name: ${APP_PREFIX:-default-}infisical-mongo
-        image: mongo
-        restart: always
-        environment:
-            - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME:-mongo}
-            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-mongo}
-        volumes:
-            - infisical-mongo-data:/data/db
-        networks:
-            - ext-network
+    #mongo:
+        #container_name: ${APP_PREFIX:-default-}infisical-mongo
+        #image: mongo
+        #restart: always
+        #environment:
+            #- MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME:-mongo}
+            #- MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-mongo}
+        #volumes:
+            #- infisical-mongo-data:/data/db
+        #networks:
+            #- ext-network
 
 volumes:
     infisical-mongo-data:
@@ -58,10 +58,10 @@ volumes:
     infisical-redis_data:
         driver: local
 
-networks:
-    ext-network:
-        external: true
-        name: ${NETWORK_NAME:-default_network}
+#networks:
+    #ext-network:
+        #external: true
+        #name: ${NETWORK_NAME:-default_network}
 
 
 # APP_NAME=home
