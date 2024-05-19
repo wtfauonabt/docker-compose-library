@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+    ########################################
+    ## Chatbot UI ##########################
+    ## Port: 3000 ##########################
+    ########################################
+    chatbot-ui:
+      image: ghcr.io/mckaywrigley/chatbot-ui:main
+      container_name: chatbot-ui
+      #ports:
+        #- "3000:3000"
+      environment:
+          - OPENAI_API_KEY=${OPENAI_API_KEY}
+
