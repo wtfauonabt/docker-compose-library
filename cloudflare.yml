@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+    ########################################
+    ## Cloudflare Tunnel ###################
+    ########################################
+    cloudflare:
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}cloudflare
+        image: cloudflare/cloudflared:latest
+        command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TOKEN}
+        networks:
+            - cloudflare
+
+networks:
+    cloudflare:
+        driver: bridge
