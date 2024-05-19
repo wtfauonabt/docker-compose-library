@@ -1,0 +1,73 @@
+version: "3.9"
+services:
+  ######################################################
+  ## Authelia ##########################################
+  ## Port: 9091 ########################################
+  ######################################################
+  authelia:
+    container_name: ${APP_PREFIX:-${APP_NAME:-default}-}authelia
+    restart: unless-stopped
+    image: authelia/authelia:latest
+    volumes:
+      - ./authelia:/config
+    environment:
+      - TZ=${TZ:-UTC}
+      #- AUTHELIA_JWT_SECRET=${AUTH_SECRET:-ea41f2b93b94e929c4686314d0ee5e493625861105f21fbe352a2b44857ffe5b}
+      #- AUTHELIA_SESSION_SECRET=${ENCRYPTION_KEY:-NYkBpn84fRg7Pf3VFpYrVrTXFrnpBSrb}
+      #- AUTHELIA_STORAGE=mysql
+      #- AUTHELIA_MYSQL_HOST=${MYSQL_HOST:-mysql}
+      #- AUTHELIA_MYSQL_PORT=${MYSQL_PORT:-3306}
+      #- AUTHELIA_MYSQL_USERNAME=${MYSQL_USERNAME:-root}
+      #- AUTHELIA_MYSQL_PASSWORD=${MYSQL_PASSWORD:-root}
+      #- AUTHELIA_MYSQL_DATABASE=${MYSQL_DATABASE:-authelia}
+      #- AUTHELIA_MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      #- AUTHELIA_NOTIFIER=filesystem
+      #- AUTHELIA_SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      #- AUTHELIA_SMTP_PORT=${SMTP_PORT:-587}
+      #- AUTHELIA_SMTP_USERNAME=${SMTP_USERNAME:-}
+      #- AUTHELIA_SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      #- AUTHELIA_SMTP_FROM_ADDRESS=${SMTP_FROM_ADDRESS:-}
+      #- AUTHELIA_SMTP_FROM_NAME=${SMTP_FROM_NAME:-}
+      #- AUTHELIA_LOG_LEVEL=${LOG_LEVEL:-info}
+      #- AUTHELIA_LOG_FORMAT=${LOG_FORMAT:-text}
+      #- AUTHELIA_ACCESS_LOG_PATH=${ACCESS_LOG_PATH:-/config/access.log}
+      #- AUTHELIA_ERROR_LOG_PATH=${ERROR_LOG_PATH:-/config/error.log}
+    #ports:
+      #- 9091:9091
+
+  ######################################################
+  ## MySQL #############################################
+  ## Port: 3306 ########################################
+  ######################################################
+  #mysql:
+    #container_name: ${APP_PREFIX:-${APP_NAME:-default}-}mysql
+    #restart: unless-stopped
+    #image: mysql:5.7
+    #volumes:
+      #- ./mysql:/var/lib/mysql
+    #environment:
+      #- TZ=${TZ:-UTC}
+      #- MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      #- MYSQL_DATABASE=${MYSQL_DATABASE:-authelia}
+      #- MYSQL_USER=${MYSQL_USERNAME:-root}
+      #- MYSQL_PASSWORD=${MYSQL_PASSWORD:-root}
+    #ports:
+      #- 3306:3306
+
+  ######################################################
+  ## Redis #############################################
+  ## Port: 6379 ########################################
+  ######################################################
+  #redis:
+    #container_name: ${APP_PREFIX:-${APP_NAME:-default}-}redis
+    #restart: unless-stopped
+    #image: redis
+    #volumes:
+      #- ./redis:/data
+    #environment:
+      #- TZ=${TZ:-UTC}
+    #ports:
+      #- 6379:6379
+
+
+
