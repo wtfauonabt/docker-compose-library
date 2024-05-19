@@ -5,18 +5,14 @@ services:
     ## PORT: 3306 ########################################
     ######################################################
     mysql:
-<<<<<<< Updated upstream
-        container_name: ${APP_PREFIX}mysql
-=======
         container_name: ${APP_PREFIX:-${APP_NAME:-default}-}mysql
->>>>>>> Stashed changes
         image: ${MYSQL_IMAGE:-mysql}
         restart: always
         environment:
             - MYSQL_DATABASE=${MYSQL_DATABASE:-default}
             - MYSQL_ROOT_USER=${MYSQL_ROOT_USER:-root}
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
-            - MYSQL_USER=${MYSQL_USER:-user}
+            - MYSQL_USER=${MYSQL_USER:-${MYSQL_USERNAME:-user}}
             - MYSQL_PASSWORD=${MYSQL_PASSWORD:-password}
         volumes:
             - mysql_data:/var/lib/mysql
