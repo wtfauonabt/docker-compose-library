@@ -1,9 +1,34 @@
 version: "3.9"
 services:
+    traefik:
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}_}traefik
+        image: traefik:latest
+        pull_policy: always
+        ports:
+            - 80:80
+            - 8080:8080
+        command:
+            - --log.level=DEBUG
+            - --api.insecure=true
+            - --api.dashboard=true
+            - --providers.docker=true
+            - --providers.docker.exposedbydefault=false
+            - --entrypoints.web.address=:80
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        labels:
+            traefik.enable: true
+      
+            # Dashboard
+            traefik.http.routers.dashboard.entrypoints: web
+            traefik.http.routers.dashboard.rule: Host(`traefik.${DOMAIN:-${BASE_DOMAIN:-localhost}}`)
+            traefik.http.services.dashboard.loadbalancer.server.port: 8080
+
+
     ############################################
     ### TRAEFIK SERVICE ########################
     ############################################
-    traefik:
+    traefik_secure:
         container_name: traefik
         image: traefik:latest
         pull_policy: always
@@ -59,6 +84,7 @@ services:
             traefik.http.middlewares.addwww.redirectregex.regex: ^https://(?:www\.)?(.*)
             traefik.http.middlewares.addwww.redirectregex.replacement: https://www.${BASE_DOMAIN:-localhost}
 
+    
     # hub-agent:
     #     container_name: hub-agent
     #     image: ghcr.io/traefik/hub-agent-traefik:v1.0.0
@@ -97,9 +123,5 @@ services:
     #         traefik.http.routers.www.tls.certresolver: syeung527resolver
     #         traefik.http.routers.profile.rule: Host(`profile.${BASE_DOMAIN:-localhost}`)
     #         traefik.http.routers.profile.entrypoints: websecure
-<<<<<<< Updated upstream
-    #         traefik.http.routers.profile.tls.certresolver: ${DEFAULT_RESOLVER:-myresolver}
-=======
     #         traefik.http.routers.profile.tls.certresolver: ${DEFAULT_RESOLVER:-myresolver}
 
->>>>>>> Stashed changes
