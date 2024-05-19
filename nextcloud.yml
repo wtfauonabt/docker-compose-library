@@ -53,22 +53,23 @@ services:
   ## Port: 80 #############################################
   #########################################################
   nextcloud:
-    container_name: ${APP_PREFIX:-default-}nextcloud
+    container_name: ${APP_PREFIX:-${APP_NAME:-default}_}nextcloud
+    image: nextcloud
+    #pull_policy: always
+    restart: always
     volumes:
       - nextcloud:/var/www/html
-      - apps:/var/www/html/custom_apps
-      - config:/var/www/html/config
-      - ${MOUNT_BASE_PATH:-/mount}/nextcloud/data:/var/www/html/data
-      - ${MOUNT_BASE_PATH:-/mount}/nextcloud/themes:/var/www/html/themes
-    image: nextcloud
-    restart: always
+      #- ${MOUNT_BASE_PATH:-./}nextcloud:/var/www/html
     # links:
     #   - db
     environment:
-      - MYSQL_PASSWORD=
+      - TZ=${TZ:-UTC}
+      - TRUSTED_DOMAINS=${TRUSTED_DOMAINS:-localhost}
+      - TRUSTED_PROXIES=${TRUSTED_PROXIES:-192.168.240.0/20} # docker network inspect proxy | grep Subnet
+      - MYSQL_HOST=${MYSQL_HOST:-db}
       - MYSQL_DATABASE=${MYSQL_DATABASE:-default}
       - MYSQL_USER=${MYSQL_ROOT_USER:-root}
-      - MYSQL_HOST=db
+      - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD:-password}
     networks:
       - env-network 
             
@@ -77,21 +78,22 @@ services:
   ## Port: 3306 ###########################################
   #########################################################
   db:
+    container_name: ${APP_PREFIX:-${APP_NAME:-default}_}db
     image: mariadb:10.6
-    container_name: ${APP_PREFIX:-default-}nextcloud-mariadb
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     environment:
+      - TZ=${TZ:-UTC}
       - MYSQL_DATABASE=${MYSQL_DATABASE:-default}
       - MYSQL_ROOT_USER=${MYSQL_ROOT_USER:-root}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
-      - MYSQL_USER=${MYSQL_USER:-user}
+      - MYSQL_USER=${MYSQL_USER:-${MYSQL_USERNAME:-user}}}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD:-password}
     volumes:
       - mariadb_data:/var/lib/mysql
       - mysql_config:/etc/mysql
-    # networks:
-    #   - env-network    
+    networks:
+       - env-network    
     
 volumes:
   nextcloud:
@@ -105,7 +107,7 @@ volumes:
   mysql_config:
     driver: local
     
-# networks:
-#   env-network:
-#     external: true
-#     name: ${NETWORK_NAME:-default_network}
+networks:
+  env-network:
+     external: true
+     name: ${NETWORK_NAME:-default_network}
