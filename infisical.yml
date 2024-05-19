@@ -6,7 +6,7 @@ services:
     ## Port: 8080 ########################################
     ######################################################
     infisical:
-        container_name: ${APP_PREFIX:-default-}infisical
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}infisical
         restart: unless-stopped
         depends_on:
             - mongo
@@ -17,9 +17,24 @@ services:
             - REDIS_URL=redis://${APP_PREFIX:-default-}redis:6379
             - AUTH_SECRET=${AUTH_SECRET:-ea41f2b93b94e929c4686314d0ee5e493625861105f21fbe352a2b44857ffe5b}
             - ENCRYPTION_KEY=${ENCRYPTION_KEY:-NYkBpn84fRg7Pf3VFpYrVrTXFrnpBSrb}
+            - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+            - SMTP_PORT=${SMTP_PORT:-587}
+            - SMTP_USERNAME=${SMTP_USERNAME:-}
+            - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+            - SMTP_FROM_ADDRESS=${SMTP_FROM_ADDRESS:-}
+            - SMTP_FROM_NAME=${SMTP_FROM_NAME:-}
         #networks:
           #- ext-network
           
+    ######################################################
+    ## Infisical CLI #####################################
+    ######################################################
+    infisical-cli:
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}infisical-cli
+        image: infisical/infisical-cli:latest
+        
+    
+
     ######################################################
     ## Redis #############################################
     ## Port: 6379 ########################################
