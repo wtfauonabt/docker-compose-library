@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+    ########################################
+    ## Open WebUI (Ollama) #################
+    ## Port: 8080 ##########################
+    ########################################
+    openweb-ui:
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}_}openweb-ui
+        image: ghcr.io/open-webui/open-webui:main
+        restart: always
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        environment:
+            - OPENAI_API_KEY=${OPENAI_API_KEY}
+            - ENABLE_SIGNUP=${ENABLE_SIGNUP:-True}
+        volumes:
+            - openweb-ui-data:/app/backend/data
+
+volumes:
+     openweb-ui-data: 
