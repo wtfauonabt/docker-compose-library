@@ -3,17 +3,24 @@ services:
     traefik:
         container_name: ${APP_PREFIX:-${APP_NAME:-default}_}traefik
         image: traefik:latest
-        pull_policy: always
+        #pull_policy: always
+        restart: always
         ports:
             - 80:80
             - 8080:8080
         command:
+            - --log=true
             - --log.level=DEBUG
             - --api.insecure=true
             - --api.dashboard=true
             - --providers.docker=true
             - --providers.docker.exposedbydefault=false
             - --entrypoints.web.address=:80
+            - --providers.docker.network=traefik
+            #- --entryPoints.http.forwardedHeaders.trustedIPs=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7
+            #- --entryPoints.http.proxyProtocol.trustedIPs=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7
+            #- --entryPoints.http.forwardedHeaders.insecure=false
+            #- --entryPoints.http.proxyProtocol.insecure=false
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock:ro
         labels:
@@ -23,7 +30,8 @@ services:
             traefik.http.routers.dashboard.entrypoints: web
             traefik.http.routers.dashboard.rule: Host(`traefik.${DOMAIN:-${BASE_DOMAIN:-localhost}}`)
             traefik.http.services.dashboard.loadbalancer.server.port: 8080
-
+            #traefik.http.routers.dashboard.middlewares: auth@docker
+            
 
     ############################################
     ### TRAEFIK SERVICE ########################
