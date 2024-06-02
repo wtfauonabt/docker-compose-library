@@ -7,21 +7,33 @@ services:
         restart: always
         ports:
             - 80:80
-            - 8080:8080
+            # Ports for DNS
+            - 53:53/tcp
+            - 53:53/udp
         command:
             - --log=true
             - --log.level=DEBUG
+            - --log.filePath=/var/log/traefik.log
             - --api.insecure=true
             - --api.dashboard=true
             - --providers.docker=true
             - --providers.docker.exposedbydefault=false
+            # For nextcloud? (not sure if its required)
+            - --providers.docker.network=proxy
+            
+            # For web
             - --entrypoints.web.address=:80
-            - --providers.docker.network=traefik
+              
+            # For pihole
+            - --entryPoints.dns-tcp.address=:53/tcp
+            - --entryPoints.dns-udp.address=:53/udp
+
             #- --entryPoints.http.forwardedHeaders.trustedIPs=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7
             #- --entryPoints.http.proxyProtocol.trustedIPs=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7
             #- --entryPoints.http.forwardedHeaders.insecure=false
             #- --entryPoints.http.proxyProtocol.insecure=false
         volumes:
+            - ${MOUNT_BASE_PATH:-./}traefik/log:/var/log
             - /var/run/docker.sock:/var/run/docker.sock:ro
         labels:
             traefik.enable: true

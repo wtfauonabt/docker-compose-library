@@ -3,24 +3,25 @@ version: '3.9'
 services:
     ######################################################
     ## PiHole ############################################
-    ## Port: 53, 80 ######################################
+    ## Port: 53/tcp, 53/udp, 80 ##########################
     ######################################################
     pihole:
-        container_name: ${APP_PREFIX:-default-}pihole
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}_}pihole
         image: pihole/pihole:latest
-        ports:
-          - "53:53/tcp"
-          - "53:53/udp"
+        #ports:
+            #- "80:80"
+            #- "53:53/tcp"
+            #- "53:53/udp"
         environment:
-          - WEBPASSWORD=${PIHOLE_PASSWORD:-password}
-          - DNSSEC=true
-          - TZ=${TZ:-Asia/Hong_Kong}
+            - WEBPASSWORD=${PIHOLE_PASSWORD:-password}
+            - DNSSEC=true
+            - TZ=${TZ:-Asia/Hong_Kong}
         volumes:
-          - pihole_data:/etc/pihole
-          - pihole_dnsmasq.d:/etc/dnsmasq.d
+            - pihole_data:/etc/pihole
+            - pihole_dnsmasq.d:/etc/dnsmasq.d
         restart: unless-stopped
-        networks:
-            - env-network
+        #networks:
+            #- env-network
     
 
 volumes:
@@ -29,10 +30,10 @@ volumes:
     pihole_dnsmasq.d:
         driver: local
 
-networks:
-    env-network:
-        name: ${NETWORK_NAME:-default_network}
-        external: true
+#networks:
+    #env-network:
+        #name: ${NETWORK_NAME:-default_network}
+        #external: true
 
 # APP_NAME=home
 # APP_PREFIX=${APP_NAME}-
