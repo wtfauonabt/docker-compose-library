@@ -26,6 +26,7 @@ services:
             #group_add:
             #  - "998" # docker group on host
         volumes:
-            - $CODER_DATA:/home/coder
-            - $CODER_CONFIG:/home/coder/.config
-            - ${DOCKER_SOCK_PATH}:/var/run/docker.sock
+            - ${CODER_DATA:-./coder/data}:/home/coder
+            - ${CODER_CONFIG:-./coder/config}:/home/coder/.config
+            - ${MOUNT_BASE_PATH:-/mnt}:/mnt
+            - ${DOCKER_SOCK_PATH:-/var/run/docker.sock}:/var/run/docker.sock
