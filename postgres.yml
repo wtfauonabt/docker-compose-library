@@ -12,7 +12,7 @@ services:
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password} 
             - POSTGRES_DB=${POSTGRES_DATABASE:-default} 
         volumes:
-            - postgres_data:/var/lib/postgresql/data
+            - ${POSTGRES_DATA:-postgres_data}:/var/lib/postgresql/data
 
 volumes:
     postgres_data:
