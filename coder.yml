@@ -2,9 +2,10 @@ version: "3.9"
 services:
     ############################################
     ### CODER ##################################
+    ### PORT: 7080 #############################
     ############################################
     coder:
-        container_name: ${APP_NAME}_coder
+        container_name: ${APP_PREFIX:-${APP_NAME}_}coder
         # This MUST be stable for our documentation and
         # other automations.
         image: ghcr.io/coder/coder:${CODER_VERSION:-latest}
@@ -12,7 +13,7 @@ services:
         #   - "7080:7080"
         user: root
         environment:
-            CODER_PG_CONNECTION_URL: "postgresql://${POSTGRES_USER:-username}:${POSTGRES_PASSWORD:-password}@postgres/${POSTGRES_DATABASE:-coder}?sslmode=disable"
+            CODER_PG_CONNECTION_URL: "postgresql://${POSTGRES_USER:-username}:${POSTGRES_PASSWORD:-password}@${APP_PREFIX}postgres/${POSTGRES_DATABASE:-coder}?sslmode=disable"
             CODER_ADDRESS: "0.0.0.0:7080"
             # You'll need to set CODER_ACCESS_URL to an IP or domain
             # that workspaces can reach. This cannot be localhost
@@ -25,6 +26,7 @@ services:
             #group_add:
             #  - "998" # docker group on host
         volumes:
-            - $CODER_DATA:/home/coder
-            - $CODER_CONFIG:/home/coder/.config
-            - ${DOCKER_SOCK_PATH}:/var/run/docker.sock
+            - ${CODER_DATA:-./coder/data}:/home/coder
+            - ${CODER_CONFIG:-./coder/config}:/home/coder/.config
+            - ${MOUNT_BASE_PATH:-/mnt}:/mnt
+            - ${DOCKER_SOCK_PATH:-/var/run/docker.sock}:/var/run/docker.sock
