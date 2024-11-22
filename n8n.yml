@@ -1,0 +1,20 @@
+services:
+    #########################################################
+    ## N8N ##################################################
+    ## Port: 5678 ###########################################
+    #########################################################
+    n8n:
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}n8n
+        image: n8nio/n8n
+        restart: always
+        #ports:
+          #- "5678:5678"
+        environment:
+            - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=${N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS}
+            - N8N_PROTOCOL=http
+            - NODE_ENV=production
+        volumes:
+            - n8n-data:/home/node/.n8n
+
+volumes:
+  n8n-data:
