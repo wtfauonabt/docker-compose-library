@@ -5,11 +5,11 @@ services:
         image: traefik:latest
         #pull_policy: always
         restart: always
-        ports:
-            - 80:80
-            # Ports for DNS
-            - 53:53/tcp
-            - 53:53/udp
+        #ports:
+            #- 80:80
+            ## Ports for DNS
+            #- 53:53/tcp
+            #- 53:53/udp
         command:
             - --log=true
             - --log.level=DEBUG
