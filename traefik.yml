@@ -1,5 +1,8 @@
 version: "3.9"
 services:
+    ############################################
+    ### TRAEFIK INSECURE SERVICE ###############
+    ############################################
     traefik:
         container_name: ${APP_PREFIX:-${APP_NAME:-default}_}traefik
         image: traefik:latest
@@ -7,9 +10,16 @@ services:
         restart: always
         ports:
             - 80:80
-            # Ports for DNS
-            - 53:53/tcp
-            - 53:53/udp
+            # Ports for pihole DNS
+            #- 53:53/tcp
+            #- 53:53/udp
+            # Ports for rustdesk
+            - 21115:21115/tcp
+            - 21116:21116/tcp
+            - 21117:21117/tcp
+            - 21118:21118/tcp
+            - 21119:21119/tcp
+            - 21116:21116/udp
         command:
             - --log=true
             - --log.level=DEBUG
@@ -25,13 +35,22 @@ services:
             - --entrypoints.web.address=:80
               
             # For pihole
-            - --entryPoints.dns-tcp.address=:53/tcp
-            - --entryPoints.dns-udp.address=:53/udp
+            #- --entryPoints.dns-tcp.address=:53/tcp
+            #- --entryPoints.dns-udp.address=:53/udp
 
             #- --entryPoints.http.forwardedHeaders.trustedIPs=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7
             #- --entryPoints.http.proxyProtocol.trustedIPs=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7
             #- --entryPoints.http.forwardedHeaders.insecure=false
-            #- --entryPoints.http.proxyProtocol.insecure=false
+            #- --entryPoints.http.proxyProtocol.insecure
+
+            # Rustdesk entrypoints
+            - --entrypoints.rd5-tcp.address=:21115/tcp # ID Server - NAT type test
+            - --entrypoints.rd6-tcp.address=:21116/tcp # ID Server - TCP hole punching
+            - --entrypoints.rd6-udp.address=:21116/udp # ID Server - ID registration and heartbeat
+            - --entrypoints.rd8-tcp.address=:21118/tcp # ID Server - Web client
+            - --entrypoints.rd7-tcp.address=:21117/tcp # Relay Server - Relay services
+            - --entrypoints.rd9-tcp.address=:21119/tcp # Relay Server - Web client=false
+
         volumes:
             - ${MOUNT_BASE_PATH:-./}traefik/log:/var/log
             - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -46,9 +65,9 @@ services:
             
 
     ############################################
-    ### TRAEFIK SERVICE ########################
+    ### TRAEFIK SECURE SERVICE #################
     ############################################
-    traefik_secure:
+    traefik-secure:
         container_name: traefik
         image: traefik:latest
         pull_policy: always
@@ -58,15 +77,18 @@ services:
         command:
             # - --log.level=DEBUG
             - --api.insecure=true
+            - --api.dashboard=true
             - --providers.docker=true
             - --providers.docker.exposedbydefault=false
             - --entrypoints.web.address=:80
-            - --entrypoints.web.http.redirections.entryPoint.to=websecure
-            - --entrypoints.web.http.redirections.entryPoint.scheme=https
-            - --entrypoints.web.http.redirections.entrypoint.permanent=true
+            #- --entrypoints.web.http.redirections.entryPoint.to=websecure
+            #- --entrypoints.web.http.redirections.entryPoint.scheme=https
+            #- --entrypoints.web.http.redirections.entrypoint.permanent=true
             - --entrypoints.websecure.address=:443
-            - --entrypoints.websecure.http.tls=true
-            - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.tlschallenge=true
+            #- --entrypoints.websecure.http.tls=true
+            #- --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.tlschallenge=true
+            #- --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.httpchallenge=true
+            #- --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.httpchallenge.entrypoint=web
             # - "--certificatesresolvers.syeung527resolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
             - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.email=${LETSENCRYPT_EMAIL:-test@example.com}
             - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.storage=/letsencrypt/acme.json
@@ -75,7 +97,10 @@ services:
             # - --hub.tls.insecure=true
             # - --metrics.prometheus.addrouterslabels=true
         volumes:
-            - ./letsencrypt:/letsencrypt
+            #- ${MOUNT_BASE_PATH:-./}traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro
+            #- ${MOUNT_BASE_PATH:-./}traefik/conf/:/etc/traefik/conf/
+            - ${MOUNT_BASE_PATH:-./}traefik/letsencrypt:/letsencrypt
+            - ${MOUNT_BASE_PATH:-./}traefik/log:/var/log
             - ${DOCKER_SOCK_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro
         labels:
             traefik.enable: true 
@@ -85,24 +110,24 @@ services:
             traefik.http.routers.dashboard.entrypoints: websecure
             traefik.http.routers.dashboard.tls.certresolver: ${DEFAULT_RESOLVER:-myresolver}
             traefik.http.routers.dashboard.service: api@internal
-            traefik.http.routers.dashboard.middlewares: auth
+            #traefik.http.routers.dashboard.middlewares: auth
 
             # Default test/test
-            traefik.http.middlewares.auth.basicauth.users: ${DASHBOARD_USER:-test}:${DASHBOARD_PASS:-$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/}
+            #traefik.http.middlewares.auth.basicauth.users: ${DASHBOARD_USER:-test}:${DASHBOARD_PASS:-$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/}
             # traefik.http.middlewares.auth.basicauth.usersfile: /path/to/my/usersfile
           
             # low priority rule for otherwise unmatched www. host prefixes
             # without this it is constant redirect
-            traefik.http.routers.unmatchedwww.rule: HostRegexp(`{name:^www\..*}`) 
-            traefik.http.routers.unmatchedwww.service: noop@internal
-            traefik.http.routers.unmatchedwww.priority: 2
+            #traefik.http.routers.unmatchedwww.rule: HostRegexp(`{name:^www\..*}`) 
+            #traefik.http.routers.unmatchedwww.service: noop@internal
+            #traefik.http.routers.unmatchedwww.priority: 2
 
             # lowest priority catchall rule, will add/replace www. host portion
-            traefik.http.routers.matchlast.rule: PathPrefix(`/`)
-            traefik.http.routers.matchlast.priority: 1
-            traefik.http.routers.matchlast.middlewares: addwww
-            traefik.http.middlewares.addwww.redirectregex.regex: ^https://(?:www\.)?(.*)
-            traefik.http.middlewares.addwww.redirectregex.replacement: https://www.${BASE_DOMAIN:-localhost}
+            #traefik.http.routers.matchlast.rule: PathPrefix(`/`)
+            #traefik.http.routers.matchlast.priority: 1
+            #traefik.http.routers.matchlast.middlewares: addwww
+            #traefik.http.middlewares.addwww.redirectregex.regex: ^https://(?:www\.)?(.*)
+            #traefik.http.middlewares.addwww.redirectregex.replacement: https://www.${BASE_DOMAIN:-localhost}
 
     
     # hub-agent:
