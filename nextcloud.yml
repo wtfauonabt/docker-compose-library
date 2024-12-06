@@ -58,12 +58,16 @@ services:
     #pull_policy: always
     restart: always
     volumes:
-      - nextcloud:/var/www/html
-      #- ${MOUNT_BASE_PATH:-./}nextcloud:/var/www/html
+      #- nextcloud:/var/www/html
+      - ${MOUNT_BASE_PATH:-./}nextcloud:/var/www/html
     # links:
     #   - db
     environment:
       - TZ=${TZ:-UTC}
+      - APACHE_DISABLE_REWRITE_IP=${APACHE_DISABLE_REWRITE_IP:-1}
+      - OVERWRITEHOST=${OVERWRITEHOST:-localhost}
+      #- OVERWRITEPROTOCOL=${OVERWRITEPROTOCOL:-https}
+      - OVERWRITECLIURL=${OVERWRITECLIURL:-https://subdomain.example.com}
       - TRUSTED_DOMAINS=${TRUSTED_DOMAINS:-localhost}
       - TRUSTED_PROXIES=${TRUSTED_PROXIES:-192.168.240.0/20} # docker network inspect proxy | grep Subnet
       - MYSQL_HOST=${MYSQL_HOST:-db}
