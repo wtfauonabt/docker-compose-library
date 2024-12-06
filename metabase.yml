@@ -1,0 +1,16 @@
+services:
+    #########################################################
+    ## Metabase #############################################
+    ## Port: 3000  ##########################################
+    #########################################################
+    metabase:
+        container_name: ${APP_PREFIX:-${APP_NAME:-default}-}metabase
+        image: metabase/metabase
+        restart: always
+        #ports:
+            #- "3000:3000"
+        #volumes:
+            #- metabase-data:
+
+#volumes:
+    #metabase-data:
