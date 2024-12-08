@@ -1,6 +1,19 @@
-version: "3.9"
-
 services:
+    ######################################################
+    ## Infisical db-migration ############################
+    ######################################################
+    db-migration:
+        container_name: infisical-db-migration
+        image: infisical/infisical:${INFISICAL_IMAGE_TAG:-latest-postgres}
+        command: npm run migration:latest
+        pull_policy: always
+        environment:
+            - NODE_ENV=production
+            - DB_CONNECTION_URI=${INFISICAL_DB_CONNECTION_URI:-postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@${APP_PREFIX:-default-}postgres:5432/${POSTGRES_DB:-postgres}}
+            - REDIS_URL=redis://${APP_PREFIX:-default-}redis:6379
+        networks:
+            - secret
+
     ######################################################
     ## Infisical #########################################
     ## Port: 8080 ########################################
@@ -8,15 +21,13 @@ services:
     infisical:
         container_name: ${APP_PREFIX:-${APP_NAME:-default}-}infisical
         restart: unless-stopped
-        depends_on:
-            - mongo
-        image: infisical/infisical:latest
+        image: infisical/infisical:${INFISICAL_IMAGE_TAG:-latest-postgres}
         environment:
             - NODE_ENV=production
-            - MONGO_URL=mongodb://${MONGO_USERNAME:-mongo}:${MONGO_PASSWORD:-mongo}@${APP_PREFIX:-default-}mongo:27017/?authSource=admin
-            - REDIS_URL=redis://${APP_PREFIX:-default-}redis:6379
-            - AUTH_SECRET=${AUTH_SECRET:-ea41f2b93b94e929c4686314d0ee5e493625861105f21fbe352a2b44857ffe5b}
-            - ENCRYPTION_KEY=${ENCRYPTION_KEY:-NYkBpn84fRg7Pf3VFpYrVrTXFrnpBSrb}
+            - DB_CONNECTION_URI=${INFISICAL_DB_CONNECTION_URI:-postgres://${INFISICAL_POSTGRES_USER:-postgres}:${INFISICAL_POSTGRES_PASSWORD:-postgres}@${APP_PREFIX:-default-}postgres:5432/${INFISICAL_POSTGRES_DB:-postgres}}
+            - REDIS_URL=${INFISICAL_REDIS_URL:-redis://${APP_PREFIX:-default-}redis:6379}
+            - AUTH_SECRET=${INFISICAL_AUTH_SECRET:-${AUTH_SECRET:-ea41f2b93b94e929c4686314d0ee5e493625861105f21fbe352a2b44857ffe5b}}
+            - ENCRYPTION_KEY=${INFISICAL_ENCRYPTION_KEY:-${ENCRYPTION_KEY:-NYkBpn84fRg7Pf3VFpYrVrTXFrnpBSrb}}
             - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
             - SMTP_PORT=${SMTP_PORT:-587}
             - SMTP_USERNAME=${SMTP_USERNAME:-}
@@ -33,4 +44,3 @@ services:
         container_name: ${APP_PREFIX:-${APP_NAME:-default}-}infisical-cli
         image: infisical/infisical-cli:latest
         
-    
