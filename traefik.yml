@@ -1,5 +1,9 @@
 version: "3.9"
 services:
+    ########################################
+    ## Traefik #############################
+    ## PORTS: 80, 443, 8080, 53/tcp, 53/udp#
+    ########################################
     traefik:
         container_name: ${APP_PREFIX:-${APP_NAME:-default}_}traefik
         image: traefik:latest
@@ -24,6 +28,32 @@ services:
             # For web
             - --entrypoints.web.address=:80
               
+            # For websecure
+            - --entrypoints.web.http.redirections.entryPoint.to=websecure
+            - --entrypoints.web.http.redirections.entryPoint.scheme=https
+            - --entrypoints.web.http.redirections.entrypoint.permanent=true
+            - --entrypoints.websecure.address=:443
+            - --entrypoints.websecure.http.tls=true
+            
+            ## TLS Challenge
+            #- --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.tlschallenge=true
+            # - "--certificatesresolvers.syeung527resolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+            
+            ## DNS Challenge
+            - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.dnsChallenge.provider=${DNS_PROVIDER:-cloudflare}
+            - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.dnsChallenge.delayBeforeCheck=${DNS_DELAY_BEFORE_CHECK:-0}
+            - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.dnsChallenge.resolvers=${DNS_RESOLVERS:-8.8.8.8:53}
+
+            # For Let's Encrypt
+            - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.email=${LETSENCRYPT_EMAIL:-test@example.com}
+            - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.storage=/letsencrypt/acme.json
+
+            # Enable Hub communication (open the port 9900 and 9901 by default)
+            # - --experimental.hub=true
+            # - --hub.tls.insecure=true
+            # - --metrics.prometheus.addrouterslabels=true
+            
+
             # For pihole
             - --entryPoints.dns-tcp.address=:53/tcp
             - --entryPoints.dns-udp.address=:53/udp
@@ -36,76 +66,63 @@ services:
             #- --entryPoints.http.forwardedHeaders.insecure=false
             #- --entryPoints.http.proxyProtocol.insecure=false
         volumes:
-            - ${MOUNT_BASE_PATH:-./}traefik/log:/var/log
+            - ${MOUNT_BASE_PATH:-.}/traefik/log:/var/log
+            - ${MOUNT_BASE_PATH:-.}/letsencrypt:/letsencrypt
             - /var/run/docker.sock:/var/run/docker.sock:ro
+        environment:
+            - TZ=${TZ:-UTC}
+            #- CF_API_EMAIL=${CF_API_EMAIL}
+            #- CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+            - CLOUDFLARE_EMAIL=${CF_API_EMAIL}
+            - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+            - CLOUDFLARE_DNS_API_TOKEN_FILE=${CF_DNS_API_TOKEN}
+            #- CLOUDFLARE_HTTP_TIMEOUT=${HTTP_TIMEOUT}
+            #- CLOUDFLARE_POLLING_INTERVAL=${POLLING_INTERVAL}
+            #- CLOUDFLARE_PROPAGATION_TIMEOUT=${PROPAGATION_TIMEOUT}
+            #- CLOUDFLARE_TTL=${TTL}
         labels:
-            traefik.enable: true
       
             # Dashboard
-            traefik.http.routers.dashboard.entrypoints: web
-            traefik.http.routers.dashboard.rule: Host(`traefik.${DOMAIN:-${BASE_DOMAIN:-localhost}}`)
+            traefik.enable: true
+            traefik.http.routers.dashboard.rule: Host(`traefik.${BASE_DOMAIN:-localhost}`)
             traefik.http.services.dashboard.loadbalancer.server.port: 8080
+            traefik.http.routers.dashboard.service: api@internal
+
+            ## web
+            #traefik.http.routers.dashboard.entrypoints: web
             #traefik.http.routers.dashboard.middlewares: auth@docker
             
-
-    ############################################
-    ### TRAEFIK SERVICE ########################
-    ############################################
-    traefik_secure:
-        container_name: traefik
-        image: traefik:latest
-        pull_policy: always
-        ports:
-            - 80:80
-            - 443:443
-        command:
-            # - --log.level=DEBUG
-            - --api.insecure=true
-            - --providers.docker=true
-            - --providers.docker.exposedbydefault=false
-            - --entrypoints.web.address=:80
-            - --entrypoints.web.http.redirections.entryPoint.to=websecure
-            - --entrypoints.web.http.redirections.entryPoint.scheme=https
-            - --entrypoints.web.http.redirections.entrypoint.permanent=true
-            - --entrypoints.websecure.address=:443
-            - --entrypoints.websecure.http.tls=true
-            - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.tlschallenge=true
-            # - "--certificatesresolvers.syeung527resolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-            - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.email=${LETSENCRYPT_EMAIL:-test@example.com}
-            - --certificatesresolvers.${DEFAULT_RESOLVER:-myresolver}.acme.storage=/letsencrypt/acme.json
-            # Enable Hub communication (open the port 9900 and 9901 by default)
-            # - --experimental.hub=true
-            # - --hub.tls.insecure=true
-            # - --metrics.prometheus.addrouterslabels=true
-        volumes:
-            - ./letsencrypt:/letsencrypt
-            - ${DOCKER_SOCK_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro
-        labels:
-            traefik.enable: true 
-
-            # Dashboard
-            traefik.http.routers.dashboard.rule: Host(`traefik.${BASE_DOMAIN:-localhost}`)
+            ## websecure
+            traefik.http.routers.dashboard.tls: true
             traefik.http.routers.dashboard.entrypoints: websecure
             traefik.http.routers.dashboard.tls.certresolver: ${DEFAULT_RESOLVER:-myresolver}
-            traefik.http.routers.dashboard.service: api@internal
-            traefik.http.routers.dashboard.middlewares: auth
 
+            # Basic Auth
+            traefik.http.routers.dashboard.middlewares: traefik-auth
+
+            # Declaring the user list
+            #
+            # Note: when used in docker-compose.yml all dollar signs in the hash need to be doubled for escaping.
+            # To create user:password pair, it's possible to use this command:
+            # echo $(htpasswd -nB user) | sed -e s/\\$/\\$\\$/g
+            #
+            # Also note that dollar signs should NOT be doubled when they not evaluated (e.g. Ansible docker_container module). 
             # Default test/test
-            traefik.http.middlewares.auth.basicauth.users: ${DASHBOARD_USER:-test}:${DASHBOARD_PASS:-$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/}
+            traefik.http.middlewares.traefik-auth.basicauth.users: ${DASHBOARD_USER:-test}:${DASHBOARD_PASS:-$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/}
             # traefik.http.middlewares.auth.basicauth.usersfile: /path/to/my/usersfile
           
             # low priority rule for otherwise unmatched www. host prefixes
             # without this it is constant redirect
-            traefik.http.routers.unmatchedwww.rule: HostRegexp(`{name:^www\..*}`) 
-            traefik.http.routers.unmatchedwww.service: noop@internal
-            traefik.http.routers.unmatchedwww.priority: 2
+            #traefik.http.routers.unmatchedwww.rule: HostRegexp(`{name:^www\..*}`) 
+            #traefik.http.routers.unmatchedwww.service: noop@internal
+            #traefik.http.routers.unmatchedwww.priority: 2
 
             # lowest priority catchall rule, will add/replace www. host portion
-            traefik.http.routers.matchlast.rule: PathPrefix(`/`)
-            traefik.http.routers.matchlast.priority: 1
-            traefik.http.routers.matchlast.middlewares: addwww
-            traefik.http.middlewares.addwww.redirectregex.regex: ^https://(?:www\.)?(.*)
-            traefik.http.middlewares.addwww.redirectregex.replacement: https://www.${BASE_DOMAIN:-localhost}
+            #traefik.http.routers.matchlast.rule: PathPrefix(`/`)
+            #traefik.http.routers.matchlast.priority: 1
+            #traefik.http.routers.matchlast.middlewares: addwww
+            #traefik.http.middlewares.addwww.redirectregex.regex: ^https://(?:www\.)?(.*)
+            #traefik.http.middlewares.addwww.redirectregex.replacement: https://www.${BASE_DOMAIN:-localhost}
 
     
     # hub-agent:
@@ -124,15 +141,24 @@ services:
     #     depends_on:
     #         - traefik
 
+    ########################################
+    ## Whoami ##############################
+    ## PORTS: 80 ###########################
+    ########################################
     whoami:
         image: traefik/whoami
         container_name: whoami
         labels:
             traefik.enable: true
-            traefik.http.routers.whoami.rule: Host(`whoami.syeung527.com`)
+            traefik.http.routers.whoami.rule: Host(`whoami.${DOMAIN:-${BASE_DOMAIN:-localhost}}`)
+            traefik.http.services.whoami.loadbalancer.server.port: 80
+            
+            ## web
+
+            ## websecure
             traefik.http.routers.whoami.entrypoints: websecure
             traefik.http.routers.whoami.tls.certresolver: ${DEFAULT_RESOLVER:-myresolver}
-            traefik.http.routers.whoami.middlewares: auth
+            #traefik.http.routers.whoami.middlewares: auth
             # traefik.http.middlewares.auth.basicauth.users: ${DASHBOARD_USER:-test}:${DASHBOARD_PASS:-$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/}
 
     # profile:
