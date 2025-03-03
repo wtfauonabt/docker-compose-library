@@ -5,14 +5,17 @@ services:
     ######################################################
     rabbitmq:
         container_name: ${APP_PREFIX:-${APP_NAME:-default}-}rabbitmq
-        image: rabbitmq:3.8-management
-        ports:
-            - "5672:5672"
-            - "15672:15672"
+        image: rabbitmq:3-management
+        hostname: rabbitmq
+        #ports:
+            #- "5672:5672"
+            #- "15672:15672"
         environment:
+            - TZ=${TZ:-Asia/Hong_Kong}
             - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-user}
             - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-password}
         volumes:
-            - ${RABBITMQ_DATA:-rabbitmq_data}:/var/lib/rabbitmq
-            - ${RABBITMQ_LOGS:-rabbitmq_logs}:/var/log/rabbitmq
-            - ${RABBITMQ_CONF:-rabbitmq_conf}:/etc/rabbitmq
+            - ${RABBITMQ_DATA:-rabbitmq_data}:/var/lib/rabbitmq:z
+            - ${RABBITMQ_LOGS:-rabbitmq_logs}:/var/log/rabbitmq:z
+            - ${RABBITMQ_CONF:-rabbitmq_conf}:/etc/rabbitmq:z
+
