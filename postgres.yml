@@ -11,8 +11,8 @@ services:
             - POSTGRES_USER=${POSTGRES_USER:-postgres} 
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password} 
             - POSTGRES_DB=${POSTGRES_DATABASE:-default} 
-        volumes:
-            - ${POSTGRES_DATA:-postgres_data}:/var/lib/postgresql/data
+        #volumes:
+            #- ${POSTGRES_DATA:-postgres_data}:/var/lib/postgresql/data
 
-volumes:
-    postgres_data:
+#volumes:
+    #postgres_data:
