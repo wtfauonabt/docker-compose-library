@@ -11,8 +11,23 @@ services:
         extra_hosts:
             - "host.docker.internal:host-gateway"
         environment:
-            - OPENAI_API_KEY=${OPENAI_API_KEY}
-            - ENABLE_SIGNUP=${ENABLE_SIGNUP:-True}
+            - GLOBAL_LOG_LEVEL=${OPENWEBUI_GLOBAL_LOG_LEVEL:-info}
+            - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+            - CORS_ALLOW_ORIGINS=${OPENWEBUI_CORS_ALLOW_ORIGINS:-*}
+            - ENABLE_SIGNUP=${OPENWEBUI_ENABLE_SIGNUP:-true}
+            - ENABLE_OAUTH_SIGNUP=${OPENWEBUI_ENABLE_OAUTH_SIGNUP:-false}
+            - WEBUI_URL=${OPENWEBUI_WEBUI_URL:-localhost}
+            - ENABLE_OAUTH_PERSISTENT_CONFIG=${OPENWEBUI_ENABLE_OAUTH_PERSISTENT_CONFIG:-false}
+            - OAUTH_MERGE_ACCOUNTS_BY_EMAIL=${OPENWEBUI_OAUTH_MERGE_ACCOUNTS_BY_EMAIL:-}
+            - OAUTH_CLIENT_ID=${OPENWEBUI_OAUTH_CLIENT_ID:-}
+            - OAUTH_CLIENT_SECRET=${OPENWEBUI_OAUTH_CLIENT_SECRET:-}
+            - OPENID_PROVIDER_URL=${OPENWEBUI_OPENID_PROVIDER_URL:-}
+            - OAUTH_PROVIDER_NAME=${OPENWEBUI_OAUTH_PROVIDER_NAME:-}
+            - OAUTH_SCOPES=${OPENWEBUI_OAUTH_SCOPES:-openid,email,profile}
+            - OPENID_REDIRECT_URI=${OPENWEBUI_OPENID_REDIRECT_URI:-http://localhost/oauth/oidc/callback}
+            - OAUTH_AUDIENCE=${OPENWEBUI_OAUTH_AUDIENCE:-}
+            - WEBUI_SESSION_COOKIE_SECURE=${OPENWEBUI_WEBUI_SESSION_COOKIE_SECURE:-true}
+            - WEBUI_AUTH_COOKIE_SECURE=${OPENWEBUI_WEBUI_AUTH_COOKIE_SECURE:-true}
         volumes:
             - openweb-ui-data:/app/backend/data
 
