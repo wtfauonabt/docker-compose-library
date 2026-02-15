@@ -97,7 +97,7 @@ services:
             traefik.http.routers.dashboard.tls.certresolver: ${DEFAULT_RESOLVER:-myresolver}
 
             # Basic Auth
-            traefik.http.routers.dashboard.middlewares: traefik-auth
+            #traefik.http.routers.dashboard.middlewares: traefik-auth
 
             # Declaring the user list
             #
